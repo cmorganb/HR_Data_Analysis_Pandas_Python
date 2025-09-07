@@ -9,10 +9,23 @@ def main():
     # Stage 1
     a_data, b_data, hr_data = load_data()
     a_df, b_df, hr_df = modify_index(a_data, b_data, hr_data)
+
+    # Stage 2
     df = merge_datasets(a_df, b_df, hr_df)
 
-    print(df.index.to_list())
-    print(df.columns.to_list())
+    # Stage 3
+    df = df.sort_values(['average_monthly_hours', 'Department'], ascending=False)
+    print(df.Department.head(10).to_list())
+
+    filtered_df = df.query("Department == 'IT' & salary == 'low'")
+    print(sum(filtered_df['number_project']))
+
+    employees_to_check = ['A4', 'B7064', 'A3033']
+    employee_check = df.loc[employees_to_check, ['last_evaluation', 'satisfaction_level']].values.tolist()
+
+    print(employee_check)
+
+
 
 def load_data():
     """Downloads the data and creates the necessary DataFrames"""
