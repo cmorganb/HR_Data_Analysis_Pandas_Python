@@ -6,10 +6,13 @@ def main():
     if not os.path.exists('../Data'):
         os.mkdir('../Data')
 
-
+    # Stage 1
     a_data, b_data, hr_data = load_data()
-
     a_df, b_df, hr_df = modify_index(a_data, b_data, hr_data)
+    df = merge_datasets(a_df, b_df, hr_df)
+
+    print(df.index.to_list())
+    print(df.columns.to_list())
 
 def load_data():
     """Downloads the data and creates the necessary DataFrames"""
@@ -49,13 +52,20 @@ def modify_index(a_df, b_df, hr_df):
 
     a_df.index = ['A' + str(i) for i in a_df['employee_office_id']]
     b_df.index = ['B' + str(i) for i in b_df['employee_office_id']]
-    hr_df = hr_df.set_index('employee_id')
-
-    print(a_df.index.to_list())
-    print(b_df.index.to_list())
-    print(hr_df.index.to_list())
+    hr_df = hr_df.set_index('employee_id', drop=False)
 
     return a_df, b_df, hr_df
+
+def merge_datasets(a_df, b_df, hr_df):
+    """Receives three datasets (office A, office B and HR) and merges and sorts them"""
+
+    df = pd.concat([a_df, b_df])
+    df = df.merge(hr_df, left_index=True, right_index=True, indicator=True)
+    df = df[df['_merge'] == 'both']
+    df = df.drop(columns=['employee_office_id', 'employee_id', '_merge'])
+    df = df.sort_index()
+
+    return df
 
 
 if __name__ == "__main__":
