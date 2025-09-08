@@ -19,10 +19,10 @@ def main():
     # solve_stage_3(df)
 
     # Stage 4
-    solve_stage_4(df)
+    # solve_stage_4(df)
 
-
-
+    # Stage 5
+    solve_stage_5(df)
 
 
 def count_bigger_5(series):
@@ -81,7 +81,6 @@ def merge_datasets(a_df, b_df, hr_df):
 
     return df
 
-
 def solve_stage_1(a_df, b_df, hr_df):
     print(a_df.index.to_list())
     print(b_df.index.to_list())
@@ -111,6 +110,25 @@ def solve_stage_4(df):
         'last_evaluation': ['mean', 'std']
         }).round(2)
     print(result.to_dict())
+
+def solve_stage_5(df):
+    pivot_1 = df.pivot_table(index='Department',
+                             columns=['left', 'salary'],
+                             values='average_monthly_hours',
+                             aggfunc='median')
+
+    filtered_pivot_1 = pivot_1.query("(`(0, 'high')` < `(0, 'medium')`) | (`(1, 'low')` < `(1, 'high')`)").round(2)
+
+
+    pivot_2 = df.pivot_table(index='time_spend_company',
+                             columns='promotion_last_5years',
+                             values=['last_evaluation', 'satisfaction_level'],
+                             aggfunc=['min', 'max', 'mean']).round(2)
+
+    filtered_pivot_2 = pivot_2.query("`('mean', 'last_evaluation', 0)` > `('mean', 'last_evaluation', 1)`")
+
+    print(filtered_pivot_1.to_dict())
+    print(filtered_pivot_2.to_dict())
 
 
 if __name__ == "__main__":
