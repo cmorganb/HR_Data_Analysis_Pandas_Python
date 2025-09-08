@@ -9,23 +9,24 @@ def main():
     # Stage 1
     a_data, b_data, hr_data = load_data()
     a_df, b_df, hr_df = modify_index(a_data, b_data, hr_data)
+    # solve_stage_1(a_df, b_df, hr_df)
 
     # Stage 2
     df = merge_datasets(a_df, b_df, hr_df)
+    # solve_stage_2(df)
 
     # Stage 3
-    df = df.sort_values(['average_monthly_hours', 'Department'], ascending=False)
-    print(df.Department.head(10).to_list())
+    # solve_stage_3(df)
 
-    filtered_df = df.query("Department == 'IT' & salary == 'low'")
-    print(sum(filtered_df['number_project']))
-
-    employees_to_check = ['A4', 'B7064', 'A3033']
-    employee_check = df.loc[employees_to_check, ['last_evaluation', 'satisfaction_level']].values.tolist()
-
-    print(employee_check)
+    # Stage 4
+    solve_stage_4(df)
 
 
+
+
+
+def count_bigger_5(series):
+    return (series > 5).sum()
 
 def load_data():
     """Downloads the data and creates the necessary DataFrames"""
@@ -79,6 +80,37 @@ def merge_datasets(a_df, b_df, hr_df):
     df = df.sort_index()
 
     return df
+
+
+def solve_stage_1(a_df, b_df, hr_df):
+    print(a_df.index.to_list())
+    print(b_df.index.to_list())
+    print(hr_df.index.to_list())
+
+def solve_stage_2(df):
+    print(df.index.to_list())
+    print(df.columns.to_list())
+
+def solve_stage_3(df):
+    df = df.sort_values(['average_monthly_hours', 'Department'], ascending=False)
+    print(df.Department.head(10).to_list())
+
+    filtered_df = df.query("Department == 'IT' & salary == 'low'")
+    print(sum(filtered_df['number_project']))
+
+    employees_to_check = ['A4', 'B7064', 'A3033']
+    employee_check = df.loc[employees_to_check, ['last_evaluation', 'satisfaction_level']].values.tolist()
+
+    print(employee_check)
+
+def solve_stage_4(df):
+    result = df.groupby('left').agg({
+        'number_project': ['median', count_bigger_5],
+        'time_spend_company': ['mean', 'median'],
+        'Work_accident': 'mean',
+        'last_evaluation': ['mean', 'std']
+        }).round(2)
+    print(result.to_dict())
 
 
 if __name__ == "__main__":
